@@ -54,6 +54,8 @@ const LinkForm = () => {
             link: link,
             clerkId: clerkId
         });
+
+        window.location.reload()
         //console.log(res);
     }
 
