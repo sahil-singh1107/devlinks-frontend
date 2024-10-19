@@ -4,6 +4,7 @@ import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import clipboard from "/public/images/icon-link-copied-to-clipboard.svg";
 import Image from 'next/image';
+import {QRCodeSVG} from 'qrcode.react';
 
 const url = process.env.NEXT_PUBLIC_GET_LINK_TREE
 
@@ -11,20 +12,20 @@ const Page = ({ params }) => {
   const username = params.username;
   const [links, setLinks] = useState([]);
   const [imgUrl, setImgUrl] = useState(null);
-  const [loading, setLoading] = useState(true); 
-  const [copySuccess, setCopySuccess] = useState(false); 
+  const [loading, setLoading] = useState(true);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true); 
+      setLoading(true);
       try {
         const res = await axios.post(url, { username });
-        setImgUrl(res.data[1]); 
-        setLinks(res.data[0]); 
+        setImgUrl(res.data[1]);
+        setLinks(res.data[0]);
       } catch (error) {
         console.error(error);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
 
@@ -32,9 +33,10 @@ const Page = ({ params }) => {
   }, [username]);
 
   const handleCopyLink = async () => {
+    console.log("copied")
     await navigator.clipboard.writeText(window.location.href);
-    setCopySuccess(true); 
-    setTimeout(() => setCopySuccess(false), 2000); 
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 2000);
   };
 
   return (
@@ -49,9 +51,9 @@ const Page = ({ params }) => {
         <p className="text-3xl font-bold text-[#512275]">{username}</p>
       </div>
 
-     
+
       <div className="mt-8 w-full max-w-md p-4 space-y-4">
-        {loading ? ( 
+        {loading ? (
           <p className="text-center text-gray-500">Loading...</p>
         ) : links.length > 0 ? (
           links.map((ele, i) => (
@@ -65,6 +67,8 @@ const Page = ({ params }) => {
           <p className="text-center text-gray-500">No links available</p>
         )}
       </div>
+
+      <QRCodeSVG value={window.location.href} />,
 
       <button onClick={handleCopyLink} className='flex space-x-3 items-center mt-4 hover:border hover:rounded-md hover:border-[#ddd6f3] p-4'>
         <Image src={clipboard} alt='clip' />

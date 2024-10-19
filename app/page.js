@@ -8,16 +8,17 @@ import React, { useState } from 'react'
 
 const page = () => {
 
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
       <div>
         <Navbar />
         <div className='flex flex-row h-screen overflow-y-hidden mt-9'>
           <div className='w-1/2 hidden lg:block lg:max-w-[769px] lg:max-h-[898px]'>
-            <LinksScreen />
+            <LinksScreen isLoading={isLoading} setIsLoading={setIsLoading} />
           </div>
           <div className='w-full h-full'>
-            <LinkForm />
+            <LinkForm isLoading={isLoading} setIsLoading={setIsLoading} />
           </div>
         </div>
 

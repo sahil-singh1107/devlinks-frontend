@@ -8,15 +8,17 @@ import linkHeader from "../public/images/icon-links-header.svg"
 import github from "../public/images/icon-github.svg"
 import axios from 'axios';
 import { useUser } from '@clerk/clerk-react'
+import { Audio, ColorRing } from 'react-loader-spinner'
 
 
-const LinkForm = () => {
+const LinkForm = ({ isLoading, setIsLoading }) => {
     // Handler for adding a new link
     const [fields, setFields] = useState(0)
     const [link, setLink] = useState(null)
     const [selectedOption, setSelectedOption] = useState("GitHub");
     const [currUrl, setCurrUrl] = useState(github)
     const [error, setError] = useState('')
+
 
     const { user, isSignedIn } = useUser()
     let clerkId;
@@ -35,6 +37,7 @@ const LinkForm = () => {
     }
 
     const handleSave = async (e) => {
+        setIsLoading(true);
         e.preventDefault()
 
         setError('')
@@ -55,13 +58,32 @@ const LinkForm = () => {
             clerkId: clerkId
         });
 
+        setIsLoading(false)
         window.location.reload()
+
         //console.log(res);
     }
 
     return (
         <>
-            <div className='relative h-[91vh] ml-3 mr-3 border p-4'>
+            {
+                isLoading && (
+                    <div className='absolute z-20 left-1/2 transform -translate-x-1/2 translate-y-[180px]'>
+                        <ColorRing
+                            visible={true}
+                            height="80"
+                            width="80"
+                            ariaLabel="color-ring-loading"
+                            wrapperStyle={{}}
+                            wrapperClass="color-ring-wrapper"
+                            colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
+                        />
+                    </div>
+                )
+            }
+
+
+            <div className={`relative h-[91vh] ml-3 mr-3 border p-4 ${isLoading && "blur"} rounded-md`}>
                 <div className='h-full overflow-y-auto pb-16'>
                     <div className='pt-10 space-y-3'>
                         <h1 className='font-bold text-3xl'>Customize Your Links</h1>
@@ -124,7 +146,7 @@ const LinkForm = () => {
                 </div>
 
                 <div className='absolute bottom-4 right-4'>
-                    <button onClick={(e) => handleSave(e)} className='bg-[#633bff] pl-5 pr-5 pt-2 pb-2 rounded-md text-white'>
+                    <button disabled={isLoading} onClick={(e) => handleSave(e)} className={`bg-[#633bff] ${isLoading && 'brightness-75'} hover:brightness-75 pl-5 pr-5 pt-2 pb-2 rounded-md text-white`}>
                         Save
                     </button>
                 </div>
