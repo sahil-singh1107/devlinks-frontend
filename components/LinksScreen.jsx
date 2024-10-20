@@ -22,7 +22,7 @@ import { ColorRing } from 'react-loader-spinner';
 const url = process.env.NEXT_PUBLIC_CREATE_LINK_TREE;
 
 const LinkForm = ({ isLoading, setIsLoading }) => {
-    const [links, setLinks] = useState([]);
+    const [links, setLinks] = useState([    ]);
     const [draggedIndex, setDraggedIndex] = useState(null);
     const [isDropLoading, setIsDropLoading] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
@@ -68,7 +68,7 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
                         link: ele.link,
                         imageUrl: gitlab
                     }));
-                    setLinks(prevLinks => [...prevLinks, ...newLinks]);
+                    setLinks(prevLinks => [...newLinks, ...prevLinks]);
                 } catch (error) {
                     console.error('Error making POST request:', error);
                 }
@@ -104,14 +104,17 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
 
     const handleDrop = (index) => {
         setIsDropLoading(false);
-        if (draggedIndex === null || draggedIndex === index) return;
+        // Check if dropped in delete area
+        if (index === links.length) {
+            handleRemoveLink(draggedIndex); // Call remove link function
+        } else if (draggedIndex !== null && draggedIndex !== index) {
+            const updatedLinks = [...links];
+            const draggedLink = updatedLinks[draggedIndex];
+            updatedLinks[draggedIndex] = updatedLinks[index];
+            updatedLinks[index] = draggedLink;
 
-        const updatedLinks = [...links];
-        const draggedLink = updatedLinks[draggedIndex];
-        updatedLinks[draggedIndex] = updatedLinks[index];
-        updatedLinks[index] = draggedLink;
-
-        setLinks(updatedLinks);
+            setLinks(updatedLinks);
+        }
         setDraggedIndex(null);
     };
 
@@ -127,6 +130,8 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
 
     // New function to remove a link
     const handleRemoveLink = async (index) => {
+        if (index === -1 || links[index].platform === "delete") return; // Prevent removal from delete area
+
         const linkToRemove = links[index].link; // Get the link to remove
 
         try {
@@ -184,19 +189,22 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
                                         <Link href={`//${ele.link}`} className='flex items-center justify-between w-full h-8'>
                                             <Image src={getLink(ele.platform)} alt='platform logo' className='w-6 h-6 ml-2' />
                                             <p className='text-white'>{ele.platform}</p>
-                                            <Image src={arrow} className='w-4 h-4 ml-4 mr-2' />
+                                            <Image src={arrow} className='mr-8' />
                                         </Link>
-                                        {/* Remove button */}
-                                        <button
-                                            onClick={() => handleRemoveLink(index)}
-                                            className="text-white text-xs absolute right-2 top-2"
-                                        >
-                                            X
-                                        </button>
+                                        
+                                        
                                     </div>
                                 </li>
                             ))}
                         </ul>
+                        {/* Delete Area */}
+                        <div 
+                            onDragOver={(e) => e.preventDefault()} 
+                            onDrop={() => handleDrop(links.length)} 
+                            className="absolute border-2 border-red-500 text-center text-white rounded-md p-2 top-64 w-60 cursor-pointer bg-red-500"
+                        >
+                            Drop here to delete
+                        </div>
                     </div>
                 </div>
 
