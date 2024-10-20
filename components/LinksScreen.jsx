@@ -17,6 +17,7 @@ import devto from "../public/images/icon-devto.svg"
 import frontendmentor from "../public/images/icon-frontend-mentor.svg"
 import hashnode from "../public/images/icon-hashnode.svg"
 import arrow from "/public/images/icon-arrow-right.svg"
+import { ColorRing } from 'react-loader-spinner';
 
 const url = process.env.NEXT_PUBLIC_CREATE_LINK_TREE
 
@@ -89,7 +90,6 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
         Codewars: "bg-red-700",
         Hashnode: "bg-blue-100",
     };
-    let linkTreeName = localStorage.getItem("linkTreeName")
     const { user, isSignedIn } = useUser();
     let clerkId;
     let imageUrl;
@@ -130,22 +130,17 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
     };
 
     const handleOnClick = () => {
+        setIsLoading(true)
         const shortName = uniqueNamesGenerator({
             dictionaries: [animals, colors, adjectives]
         });
 
         try {
-            if (!linkTreeName) {
-                axios.post(url, { imageUrl, links, username: shortName });
-                localStorage.setItem("linkTreeName", shortName);
-                linkTreeName = shortName
-            }
+            axios.post(url, { imageUrl, links, username: shortName, clerkId });
         } catch (error) {
             console.log(error);
-        } finally {
-
-            window.open(`/linktree/${linkTreeName || shortName}`, '_blank');
         }
+        setIsLoading(false)
     }
     //console.log(linkTreeName)
 
@@ -180,48 +175,65 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
     }
 
     return (
-        <div className={`relative flex justify-center ${isLoading && "blur-sm"} border rounded-md`}>
-            <div className='hover:brightness-75'>
-            <Image src={phonemockup} alt="Phone Mockup" className={`${isDropLoading && "blur-sm "}`} />
-            </div>
-            
-            <div className={`absolute top-[115px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 `}>
-                <div className='z-10'>
-                    <UserButton appearance={userButtonAppearance} />
+        <>
+            {
+                isLoading && (
+                    <div className='absolute z-30 left-1/2 transform -translate-x-1/2 translate-y-[180px]'>
+                        <ColorRing
+                            visible={true}
+                            height="80"
+                            width="80"
+                            ariaLabel="color-ring-loading"
+                            wrapperStyle={{}}
+                            wrapperClass="color-ring-wrapper"
+                            colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
+                        />
+                    </div>
+                )
+            }
+            <div className={`relative flex justify-center ${isLoading && "blur-sm"} border rounded-md`}>
+                <div className='hover:brightness-75'>
+                    <Image src={phonemockup} alt="Phone Mockup" className={`${isDropLoading && "blur-sm "}`} />
                 </div>
 
-                <p className='absolute top-[112px] text-center text-red-800 font-bold text-xs z-10'>
-                    {user?.firstName?.toUpperCase().slice(6) || "User"}
-                </p>
-                <div className='absolute w-[240px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-[270px] h-72 flex flex-col gap-y-4 z-10'>
-                    <ul>
-                        {links.map((ele, index) => (
-                            <li>
-                                <div
-                                    key={index}
-                                    draggable
-                                    onDragStart={() => handleDragStart(index)}
-                                    onDragOver={(e) => e.preventDefault()}
-                                    onDrop={() => handleDrop(index)}
-                                    className={`cursor-move ${colorClasses[ele.platform]} flex flex-col rounded-md h-[36px] mb-[26px] hover:brightness-75`}
-                                >
-                                    <Link href={`//${ele.link}`} className='flex items-center justify-between w-full h-8'>
-                                        <Image src={getLink(ele.platform)} alt='platform logo' className='w-6 h-6 ml-2' />
-                                        <p className='text-white'>{ele.platform}</p>
-                                        <Image src={arrow} className='w-4 h-4 ml-4 mr-2' />
-                                    </Link>
-                                </div>
-                            </li>
+                <div className={`absolute top-[115px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 `}>
+                    <div className='z-10'>
+                        <UserButton appearance={userButtonAppearance} />
+                    </div>
 
-                        ))}
-                    </ul>
+                    <p className='absolute top-[112px] text-center text-red-800 font-bold text-xs z-10'>
+                        {user?.firstName?.toUpperCase().slice(6) || "User"}
+                    </p>
+                    <div className='absolute w-[240px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-[270px] h-72 flex flex-col gap-y-4 z-10'>
+                        <ul>
+                            {links.map((ele, index) => (
+                                <li>
+                                    <div
+                                        key={index}
+                                        draggable
+                                        onDragStart={() => handleDragStart(index)}
+                                        onDragOver={(e) => e.preventDefault()}
+                                        onDrop={() => handleDrop(index)}
+                                        className={`cursor-move ${colorClasses[ele.platform]} flex flex-col rounded-md h-[36px] mb-[26px] hover:brightness-75`}
+                                    >
+                                        <Link href={`//${ele.link}`} className='flex items-center justify-between w-full h-8'>
+                                            <Image src={getLink(ele.platform)} alt='platform logo' className='w-6 h-6 ml-2' />
+                                            <p className='text-white'>{ele.platform}</p>
+                                            <Image src={arrow} className='w-4 h-4 ml-4 mr-2' />
+                                        </Link>
+                                    </div>
+                                </li>
+
+                            ))}
+                        </ul>
 
 
+                    </div>
                 </div>
-            </div>
 
-            <button className={`absolute ${isDropLoading && "blur-sm"} text-sm p-2 border font-semibold text-[#7550fe] border-[#7550fe] rounded-md`} onClick={handleOnClick}>{!linkTreeName ? "Create" : "Link Tree"}</button>
-        </div>
+                <button className={`absolute ${isDropLoading && "blur-sm"} text-sm p-2 border font-semibold text-[#7550fe] border-[#7550fe] rounded-md`} onClick={handleOnClick}>Create</button>
+            </div>
+        </>
     );
 };
 

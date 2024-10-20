@@ -7,12 +7,24 @@ import linkHeader from "../public/images/icon-links-header.svg"
 import preview from "/public/images/icon-preview-header.svg"
 import { UserButton } from '@clerk/nextjs';
 import MobilePreview from '@/components/MobilePreview'
+import { useUser } from '@clerk/clerk-react'
+import { useRouter } from 'next/navigation'
 
 const Navbar = () => {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [width, setWidth] = useState(window.innerWidth);
   const [height, setHeight] = useState(window.innerHeight);
+  const router = useRouter();
+
+  const { user, isSignedIn } = useUser()
+  let clerkId,name;
+  if (isSignedIn) {
+    clerkId = user?.id
+    name = user?.firstName
+    //console.log(clerkId)
+  }
+
   const updateDimensions = () => {
     setWidth(window.innerWidth);
     setHeight(window.innerHeight);
@@ -27,6 +39,11 @@ const Navbar = () => {
     if (width <= 1020) setIsDialogOpen(!isDialogOpen);
   };
 
+  const handleClick = () => {
+    const path = name + clerkId;
+    router.push(`/dashboard/${path}`)
+  }
+
 
   return (
     <div className="mt-4 mb-4 pl-3 pr-3 bg-[#fefeff]">
@@ -39,7 +56,7 @@ const Navbar = () => {
         </div>
         <nav className="flex space-x-6">
           <div className='hidden md:block'>
-            <button className="flex items-center bg-[#eeeaff] text-[#7550fe] px-4 py-2 rounded">
+            <button className="flex items-center bg-[#eeeaff] text-[#7550fe] px-4 py-2 rounded" onClick={handleClick}>
               <Image src={linkImage} alt="Link Icon" width={20} height={20} className="mr-2" />
               Link
             </button>
