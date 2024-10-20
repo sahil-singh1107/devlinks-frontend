@@ -25,7 +25,7 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
     const [links, setLinks] = useState([]);
     const [draggedIndex, setDraggedIndex] = useState(null);
     const [isDropLoading, setIsDropLoading] = useState(false);
-    const [isCreating, setIsCreating] = useState(false); // Add a state to track the creating process
+    const [isCreating, setIsCreating] = useState(false);
     let options = [
         { name: "GitHub", imageUrl: github, color: "black" },
         { name: "Youtube", imageUrl: youtube, color: "red" },
@@ -83,18 +83,18 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
         },
     };
 
-    const handleOnClick = async () => { // Make this function async
-        setIsCreating(true); // Set loading state
+    const handleOnClick = async () => {
+        setIsCreating(true);
         const shortName = uniqueNamesGenerator({
             dictionaries: [animals, colors, adjectives]
         });
 
         try {
-            await axios.post(url, { imageUrl, links, username: shortName, clerkId }); // Await the API call
+            await axios.post(url, { imageUrl, links, username: shortName, clerkId });
         } catch (error) {
             console.log(error);
         }
-        setIsCreating(false); // Reset loading state
+        setIsCreating(false);
     };
 
     const handleDragStart = (index) => {
@@ -115,7 +115,7 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
         setDraggedIndex(null);
     };
 
-    function getLink(platform) {
+    const getLink = (platform) => {
         let res;
         options.forEach(element => {
             if (element.name === platform) {
@@ -123,11 +123,16 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
             }
         });
         return res;
-    }
+    };
+
+    // New function to remove a link
+    const handleRemoveLink = (index) => {
+        setLinks((prevLinks) => prevLinks.filter((_, i) => i !== index));
+    };
 
     return (
         <>
-            {isCreating && ( // Show loader when creating
+            {isCreating && (
                 <div className='absolute z-30 left-1/2 transform -translate-x-1/2 translate-y-[180px]'>
                     <ColorRing
                         visible={true}
@@ -145,7 +150,7 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
                     <Image src={phonemockup} alt="Phone Mockup" className={`${isDropLoading && "blur-sm "}`} />
                 </div>
 
-                <div className={`absolute top-[115px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 `}>
+                <div className={`absolute top-[115px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10`}>
                     <div className='z-10'>
                         <UserButton appearance={userButtonAppearance} />
                     </div>
@@ -169,6 +174,13 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
                                             <p className='text-white'>{ele.platform}</p>
                                             <Image src={arrow} className='w-4 h-4 ml-4 mr-2' />
                                         </Link>
+                                        {/* Remove button */}
+                                        <button 
+                                            onClick={() => handleRemoveLink(index)}
+                                            className="text-white text-xs absolute right-2 top-2"
+                                        >
+                                            X
+                                        </button>
                                     </div>
                                 </li>
                             ))}
