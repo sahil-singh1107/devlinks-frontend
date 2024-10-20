@@ -84,11 +84,30 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
     };
 
     const handleOnClick = async () => {
-        
+        setIsCreating(true);
         const shortName = uniqueNamesGenerator({
             dictionaries: [animals, colors, adjectives]
         });
-        setIsCreating(true);
+
+        console.log(imageUrl, links, clerkId)
+
+        if (!imageUrl) {
+            alert("User image URL is not available.");
+            setIsCreating(false);
+            return;
+        }
+
+        if (links.length === 0) {
+            alert("No links to create.");
+            setIsCreating(false);
+            return;
+        }
+
+        if (!clerkId) {
+            alert("User is not signed in.");
+            setIsCreating(false);
+            return;
+        }
         try {
             await axios.post(url, { imageUrl, links, username: shortName, clerkId });
         } catch (error) {
@@ -191,16 +210,16 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
                                             <p className='text-white'>{ele.platform}</p>
                                             <Image src={arrow} className='mr-8' />
                                         </Link>
-                                        
-                                        
+
+
                                     </div>
                                 </li>
                             ))}
                         </ul>
                         {/* Delete Area */}
-                        <div 
-                            onDragOver={(e) => e.preventDefault()} 
-                            onDrop={() => handleDrop(links.length)} 
+                        <div
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={() => handleDrop(links.length)}
                             className="absolute border-2 border-red-500 text-center text-white rounded-md p-2 top-64 w-60 cursor-pointer bg-red-500"
                         >
                             Drop here to delete
