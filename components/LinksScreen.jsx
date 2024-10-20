@@ -22,7 +22,7 @@ import { ColorRing } from 'react-loader-spinner';
 const url = process.env.NEXT_PUBLIC_CREATE_LINK_TREE;
 
 const LinkForm = ({ isLoading, setIsLoading }) => {
-    const [links, setLinks] = useState([    ]);
+    const [links, setLinks] = useState([]);
     const [draggedIndex, setDraggedIndex] = useState(null);
     const [isDropLoading, setIsDropLoading] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
@@ -84,11 +84,11 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
     };
 
     const handleOnClick = async () => {
-        setIsCreating(true);
+        
         const shortName = uniqueNamesGenerator({
             dictionaries: [animals, colors, adjectives]
         });
-
+        setIsCreating(true);
         try {
             await axios.post(url, { imageUrl, links, username: shortName, clerkId });
         } catch (error) {
