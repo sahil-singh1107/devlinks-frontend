@@ -73,7 +73,7 @@ const page = ({ params }) => {
         <UserButton />
       </div>
       <div className="w-full border border-gray mt-8"></div>
-      <div ref={containerRef} className="flex flex-wrap p-9 space-x-2 justify-around">
+      <div ref={containerRef} className="flex flex-wrap p-9 space-x-2 justify-around h-[45vw]">
         {
           linkTrees.map((ele, index) => (
             <motion.div drag dragConstraints={containerRef} onDragEnd={(event, info) => handleDragEnd(event, info, index)} whileDrag={{ scale: 1.2 }} className='relative w-60 h-72 rounded-2xl bg-purple-500/90 text-white px-8 py-10 overflow-hidde hover:brightness-75 z-20'>
@@ -93,7 +93,7 @@ const page = ({ params }) => {
           <FaTrash />
         </IconContext.Provider>
       </div>
-      <button className="absolute bottom-5 right-5 w-12 h-12 bg-yellow-100 text-white rounded-full flex items-center justify-center hover:shadow-md" onClick={handleClick}>
+      <button className="absolute z-10 bottom-5 right-5 w-12 h-12 bg-yellow-100 text-white rounded-full flex items-center justify-center hover:shadow-md" onClick={handleClick}>
         <IconContext.Provider value={{ color: "yellow", className: "global-class-name", size: "1.5em" }}>
           <FaPlus />
         </IconContext.Provider>

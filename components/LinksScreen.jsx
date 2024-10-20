@@ -126,8 +126,20 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
     };
 
     // New function to remove a link
-    const handleRemoveLink = (index) => {
-        setLinks((prevLinks) => prevLinks.filter((_, i) => i !== index));
+    const handleRemoveLink = async (index) => {
+        const linkToRemove = links[index].link; // Get the link to remove
+
+        try {
+            const response = await axios.post(process.env.NEXT_PUBLIC_DELETE_LINK, { link: linkToRemove });
+
+            if (response.status === 200) {
+                // Update the state to remove the link from the UI
+                setLinks((prevLinks) => prevLinks.filter((_, i) => i !== index));
+            }
+        } catch (error) {
+            console.error('Error deleting link:', error);
+            // You might want to show an error message to the user here
+        }
     };
 
     return (
@@ -175,7 +187,7 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
                                             <Image src={arrow} className='w-4 h-4 ml-4 mr-2' />
                                         </Link>
                                         {/* Remove button */}
-                                        <button 
+                                        <button
                                             onClick={() => handleRemoveLink(index)}
                                             className="text-white text-xs absolute right-2 top-2"
                                         >
