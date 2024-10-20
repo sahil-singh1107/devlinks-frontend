@@ -37,37 +37,45 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
     }
 
     const handleSave = async (e) => {
-        setIsLoading(true);
+        console.log(error);
         e.preventDefault()
-
-        setError('')
-
+        if (error || !fields) return;
+        setError(null)
         if (!link) {
             setError("Can't be empty")
             return;
         }
 
-        if (!link.includes(selectedOption.toLocaleLowerCase())) {
+        if (!link.includes(selectedOption.toLowerCase())) {
             setError('Please check the url')
             return;
         }
 
-        const res = await axios.post(process.env.NEXT_PUBLIC_CREATE_LINK_URL, {
-            platform: selectedOption,
-            link: link,
-            clerkId: clerkId
-        });
+        setIsLoading(true);
 
-        setIsLoading(false)
-        window.location.reload()
+        try {
+            const res = await axios.post(process.env.NEXT_PUBLIC_CREATE_LINK_URL, {
+                platform: selectedOption,
+                link: link,
+                clerkId: clerkId,
+            });
+        } catch (error) {
+            console.error('Error saving link:', error);
+            setError('An error occurred while saving the link.');
+        } finally {
+            // Always stop the loader, regardless of success or error
+            setIsLoading(false);
+        }
 
         //console.log(res);
     }
 
+    
+
     return (
         <>
             {
-                isLoading && (
+                isLoading && !error && (
                     <div className='absolute z-20 left-1/2 transform -translate-x-1/2 translate-y-[180px]'>
                         <ColorRing
                             visible={true}
@@ -146,7 +154,7 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
                 </div>
 
                 <div className='absolute bottom-4 right-4'>
-                    <button disabled={isLoading} onClick={(e) => handleSave(e)} className={`bg-[#633bff] ${isLoading && 'brightness-75'} hover:brightness-75 pl-5 pr-5 pt-2 pb-2 rounded-md text-white`}>
+                    <button disabled={isLoading || error || !fields} onClick={(e) => handleSave(e)} className={`bg-[#633bff] ${isLoading && 'brightness-75'} hover:brightness-75 pl-5 pr-5 pt-2 pb-2 rounded-md text-white`}>
                         Save
                     </button>
                 </div>
