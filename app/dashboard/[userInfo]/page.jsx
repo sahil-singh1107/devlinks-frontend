@@ -53,7 +53,9 @@ const page = ({ params }) => {
     const draggedElement = event.target;
     console.log(linkTrees[index])
     try {
-      await axios.delete(process.env.NEXT_PUBLIC_GET_ALL_LINK_TREE, {clerkId,username: linkTrees[index.username]})
+      const res = await axios.post(process.env.NEXT_PUBLIC_DELETE_LINK_TREE, {clerkId,username: linkTrees[index.username]})
+      console.log(res)
+      window.location.reload()
     } catch (error) {
       console.log(error)
     }
