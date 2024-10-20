@@ -49,12 +49,13 @@ const page = ({ params }) => {
     );
   };
 
-  const handleDragEnd = (event, info, index) => {
+  const handleDragEnd = async (event, info, index) => {
     const draggedElement = event.target;
     console.log(linkTrees[index])
-    if (isOverlapping(draggedElement)) {
-      // If overlapping with the delete zone, remove the element
-      setLinkTrees((prev) => prev.filter((_, i) => i !== index));
+    try {
+      await axios.delete(process.env.NEXT_PUBLIC_GET_ALL_LINK_TREE, {clerkId,username: linkTrees[index.username]})
+    } catch (error) {
+      console.log(error)
     }
   };
 
