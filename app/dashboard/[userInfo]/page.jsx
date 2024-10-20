@@ -50,18 +50,22 @@ const page = ({ params }) => {
   };
 
   const handleDragEnd = async (event, info, index) => {
-    const draggedElement = event.target;
-    console.log(linkTrees[index])
-    try {
-      const res = await axios.post(process.env.NEXT_PUBLIC_DELETE_LINK_TREE, {clerkId,username: linkTrees[index.username]})
-      console.log(res)
-      window.location.reload()
-    } catch (error) {
-      console.log(error)
+    const dragElement = event.target;
+
+    if (isOverlapping(dragElement)) {
+      try {
+        const res = await axios.post(process.env.NEXT_PUBLIC_DELETE_LINK_TREE, { clerkId, username: linkTrees[index].username });
+        console.log(res);
+        
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      console.log('Not in delete zone');
     }
   };
 
-  
+
 
   return (
     <>
