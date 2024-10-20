@@ -4,80 +4,40 @@ import Image from 'next/image';
 import { UserButton } from '@clerk/nextjs';
 import { useUser } from '@clerk/clerk-react';
 import axios from 'axios';
-import gitlab from "../public/images/icon-gitlab.svg"
+import gitlab from "../public/images/icon-gitlab.svg";
 import Link from 'next/link';
-import { uniqueNamesGenerator, adjectives, colors, animals, starWars, NumberDictionary } from 'unique-names-generator';
-import github from "../public/images/icon-github.svg"
-import youtube from "../public/images/icon-youtube.svg"
-import facebook from "../public/images/icon-facebook.svg"
-import freecodecamp from "../public/images/icon-freecodecamp.svg"
-import codepen from "../public/images/icon-codepen.svg"
-import codewars from "../public/images/icon-codewars.svg"
-import devto from "../public/images/icon-devto.svg"
-import frontendmentor from "../public/images/icon-frontend-mentor.svg"
-import hashnode from "../public/images/icon-hashnode.svg"
-import arrow from "/public/images/icon-arrow-right.svg"
+import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
+import github from "../public/images/icon-github.svg";
+import youtube from "../public/images/icon-youtube.svg";
+import facebook from "../public/images/icon-facebook.svg";
+import freecodecamp from "../public/images/icon-freecodecamp.svg";
+import codepen from "../public/images/icon-codepen.svg";
+import codewars from "../public/images/icon-codewars.svg";
+import devto from "../public/images/icon-devto.svg";
+import frontendmentor from "../public/images/icon-frontend-mentor.svg";
+import hashnode from "../public/images/icon-hashnode.svg";
+import arrow from "/public/images/icon-arrow-right.svg";
 import { ColorRing } from 'react-loader-spinner';
 
-const url = process.env.NEXT_PUBLIC_CREATE_LINK_TREE
+const url = process.env.NEXT_PUBLIC_CREATE_LINK_TREE;
 
 const LinkForm = ({ isLoading, setIsLoading }) => {
     const [links, setLinks] = useState([]);
     const [draggedIndex, setDraggedIndex] = useState(null);
-    const [isDropLoading, setIsDropLoading] = useState(false)
+    const [isDropLoading, setIsDropLoading] = useState(false);
+    const [isCreating, setIsCreating] = useState(false); // Add a state to track the creating process
     let options = [
-
-        {
-            name: "GitHub",
-            imageUrl: github,
-            color: "black"
-        },
-        {
-            name: "Youtube",
-            imageUrl: youtube,
-            color: "red"
-        },
-        {
-            name: "Facebook",
-            imageUrl: facebook,
-            color: "blue"
-        },
-        {
-            name: 'Freecodecamp',
-            imageUrl: freecodecamp,
-            color: "#1A1A32"
-        },
-        {
-            name: "GitLab",
-            imageUrl: gitlab,
-            color: "black"
-        },
-        {
-            name: "Devto",
-            imageUrl: devto,
-            color: "#F4F4F5"
-        },
-        {
-            name: "FrontendMentor",
-            imageUrl: frontendmentor,
-            color: "white"
-        },
-        {
-            name: "Codepen",
-            imageUrl: codepen,
-            color: "#121517"
-        },
-        {
-            name: "Codewars",
-            imageUrl: codewars,
-            color: "#411C1E"
-        },
-        {
-            name: "Hashnode",
-            imageUrl: hashnode,
-            color: "#C9D8FA"
-        }
-    ]
+        { name: "GitHub", imageUrl: github, color: "black" },
+        { name: "Youtube", imageUrl: youtube, color: "red" },
+        { name: "Facebook", imageUrl: facebook, color: "blue" },
+        { name: 'Freecodecamp', imageUrl: freecodecamp, color: "#1A1A32" },
+        { name: "GitLab", imageUrl: gitlab, color: "black" },
+        { name: "Devto", imageUrl: devto, color: "#F4F4F5" },
+        { name: "FrontendMentor", imageUrl: frontendmentor, color: "white" },
+        { name: "Codepen", imageUrl: codepen, color: "#121517" },
+        { name: "Codewars", imageUrl: codewars, color: "#411C1E" },
+        { name: "Hashnode", imageUrl: hashnode, color: "#C9D8FA" }
+    ];
     const colorClasses = {
         GitHub: "bg-black",
         Youtube: "bg-red-500",
@@ -95,26 +55,20 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
     let imageUrl;
     if (isSignedIn) {
         clerkId = user?.id;
-        imageUrl = user?.imageUrl
+        imageUrl = user?.imageUrl;
     }
 
     useEffect(() => {
         const postData = async () => {
             if (clerkId) {
                 try {
-
                     const response = await axios.post(process.env.NEXT_PUBLIC_GET_LINKS, { clerkId });
-
                     const newLinks = response.data.map(ele => ({
                         platform: ele.platform,
                         link: ele.link,
                         imageUrl: gitlab
                     }));
-
-
-
                     setLinks(prevLinks => [...prevLinks, ...newLinks]);
-
                 } catch (error) {
                     console.error('Error making POST request:', error);
                 }
@@ -129,30 +83,28 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
         },
     };
 
-    const handleOnClick = () => {
-        setIsLoading(true)
+    const handleOnClick = async () => { // Make this function async
+        setIsCreating(true); // Set loading state
         const shortName = uniqueNamesGenerator({
             dictionaries: [animals, colors, adjectives]
         });
 
         try {
-            axios.post(url, { imageUrl, links, username: shortName, clerkId });
+            await axios.post(url, { imageUrl, links, username: shortName, clerkId }); // Await the API call
         } catch (error) {
             console.log(error);
         }
-        setIsLoading(false)
-    }
-    //console.log(linkTreeName)
+        setIsCreating(false); // Reset loading state
+    };
 
     const handleDragStart = (index) => {
-        setIsDropLoading(true)
+        setIsDropLoading(true);
         setDraggedIndex(index);
     };
 
     const handleDrop = (index) => {
-        setIsDropLoading(false)
+        setIsDropLoading(false);
         if (draggedIndex === null || draggedIndex === index) return;
-
 
         const updatedLinks = [...links];
         const draggedLink = updatedLinks[draggedIndex];
@@ -171,27 +123,24 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
             }
         });
         return res;
-
     }
 
     return (
         <>
-            {
-                isLoading && (
-                    <div className='absolute z-30 left-1/2 transform -translate-x-1/2 translate-y-[180px]'>
-                        <ColorRing
-                            visible={true}
-                            height="80"
-                            width="80"
-                            ariaLabel="color-ring-loading"
-                            wrapperStyle={{}}
-                            wrapperClass="color-ring-wrapper"
-                            colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
-                        />
-                    </div>
-                )
-            }
-            <div className={`relative flex justify-center ${isLoading && "blur-sm"} border rounded-md`}>
+            {isCreating && ( // Show loader when creating
+                <div className='absolute z-30 left-1/2 transform -translate-x-1/2 translate-y-[180px]'>
+                    <ColorRing
+                        visible={true}
+                        height="80"
+                        width="80"
+                        ariaLabel="color-ring-loading"
+                        wrapperStyle={{}}
+                        wrapperClass="color-ring-wrapper"
+                        colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
+                    />
+                </div>
+            )}
+            <div className={`relative flex justify-center ${isCreating && "blur-sm"} border rounded-md`}>
                 <div className='hover:brightness-75'>
                     <Image src={phonemockup} alt="Phone Mockup" className={`${isDropLoading && "blur-sm "}`} />
                 </div>
@@ -207,9 +156,8 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
                     <div className='absolute w-[240px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-[270px] h-72 flex flex-col gap-y-4 z-10'>
                         <ul>
                             {links.map((ele, index) => (
-                                <li>
+                                <li key={index}>
                                     <div
-                                        key={index}
                                         draggable
                                         onDragStart={() => handleDragStart(index)}
                                         onDragOver={(e) => e.preventDefault()}
@@ -223,11 +171,8 @@ const LinkForm = ({ isLoading, setIsLoading }) => {
                                         </Link>
                                     </div>
                                 </li>
-
                             ))}
                         </ul>
-
-
                     </div>
                 </div>
 
